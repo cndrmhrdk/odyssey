@@ -81,7 +81,108 @@ const getMyAchievements = async (userId) => {
     return achievements;    
 };
 
+const getAllAchievements = async () => {
+    return await prisma.achievement.findMany({
+        orderBy: {
+            requirement: "asc",
+        },
+    });
+};
+
+const createAchievement = async ({title, description, type, requirement,}) => {
+    const existingAchievement = await prisma.achievement.findFirst({
+        where: {
+            title,
+        },
+    });
+
+    if(existingAchievement) {
+        throw new Error("Achievement sudah ada");
+    }
+
+    const achievement = await prisma.achievement.create({
+        data: {
+            title,
+            description,
+            type,
+            requirement,
+        },
+    });
+
+    return achievement;
+};
+
+const updateAchievement = async (id, {title, description, type, requirement,}) => {
+    const achievement = await prisma.achievement.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    if(!achievement) {
+        throw new Error("Achievement tidak ditemukan");
+    }
+
+    if(title && title !== achievement.title) {
+        const existingAchievement = await prisma.achievement.findFirst({
+            where: {
+                title,
+            },
+        });
+
+        if(existingAchievement) {
+            throw new Error("Judul achievement sudah digunakan");
+        }
+    }
+
+    const updatedAchievement = await prisma.achievement.update({
+        where: {
+            id,
+        },
+        data: {
+            title,
+            description,
+            type,
+            requirement,
+        }
+    });
+
+    return updatedAchievement;
+};
+
+const deleteAchievement = async (id) => {
+    const achievement = await prisma.achievement.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    if(!achievement) {
+        throw new Error("Achievement tidak ditemukan");
+    }
+
+    const totalUnlocked = await prisma.characterAchievement.count({
+        where: {
+            achievementId: id,
+        },
+    });
+
+    if(totalUnlocked > 0) {
+        throw new Error("Achievement tidak dapat dihapus karena sudah dimiliki player");
+    }
+
+    await prisma.achievement.delete({
+        where: {
+            id,
+        },
+    });
+};
+
 module.exports = {
     checkQuestAchievement,
     getMyAchievements,
+    getAllAchievements,
+    createAchievement,
+    updateAchievement,
+    deleteAchievement,
 };
