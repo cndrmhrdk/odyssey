@@ -207,7 +207,7 @@ const createQuest = async ({title, description, difficulty, regionId, xpReward, 
 const updateQuest = async (questId, {title, description, difficulty, regionId, xpReward, coinReward,}) => {
     const quest = await prisma.quest.findUnique({
         where: {
-            id: quest,
+            id: questId,
         },
         include: {
             reward: true,
@@ -277,10 +277,47 @@ const updateQuest = async (questId, {title, description, difficulty, regionId, x
     });
 };
 
+const deleteQuest = async (questId) => {
+    const quest = await prisma.quest.findUnique({
+        where: {
+            id: questId,
+        },
+    });
+
+    if(!quest) {
+        throw new Error("Quest tidak ditemukan");
+    }
+
+    const totalProgress = await prisma.questProgress.count({
+        where: {
+            questId,
+        },
+    });
+
+    if(totalProgress > 0) {
+        throw new Error("Quest tidak dapat dihapus karena sudah pernah dimainkan");
+    }
+
+    await prisma.$transaction(async (tx) => {
+        await tx.questReward.delete({
+            where: {
+                questId,
+            },
+        });
+
+        await tx.quest.delete({
+            where: {
+                id: questId,
+            },
+        });
+    });
+};
+
 module.exports = {
     getAllQuests,
     startQuest,
     completeQuest,
     createQuest,
     updateQuest,
+    deleteQuest,
 };

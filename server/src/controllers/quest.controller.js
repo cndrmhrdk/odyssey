@@ -59,11 +59,43 @@ const createQuest = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+const updateQuest = async (req, res, next) => {
+    try {
+        const quest = await questService.updateQuest(
+            req.params.questId,
+            req.body,
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Quest berhasil diperbarui",
+            data: quest,
+        });
+    } catch (error) {
+        next(error);
+    }
 }
+
+const deleteQuest = async (req, res, next) => {
+    try {
+        await questService.deleteQuest(req.params.questId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Quest berhasil dihapus",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 module.exports = {
     getAllQuests,
     startQuest,
     completeQuest,
     createQuest,
+    updateQuest,
+    deleteQuest,
 };
