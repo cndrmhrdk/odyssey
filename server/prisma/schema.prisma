@@ -1,0 +1,173 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  ADMIN
+  PLAYER
+}
+
+model Role {
+  id        String    @id @default(cuid())
+  name      RoleName  @unique
+
+  users     User[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model User {
+  id         String      @id @default(cuid())
+  username   String      @unique
+  email      String      @unique
+  password   String
+
+  roleId     String
+  role        Role        @relation(fields: [roleId], references: [id])
+
+  character   Character?
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Character {
+  id          String    @id @default(cuid())
+
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+
+  nickname    String    @unique
+
+  level       Int       @default(1)
+  xp          Int       @default(0)
+  coin        Int       @default(0)
+
+  avatar      String?
+  title       String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  questProgress QuestProgress[]
+  achievements CharacterAchievement[]
+}
+
+enum QuestDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ProgressStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Region {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+
+  quests      Quest[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Quest {
+  id          String            @id @default(cuid())
+  title       String
+  description String?
+
+  difficulty  QuestDifficulty
+
+  regionId    String
+  region       Region           @relation(fields: [regionId], references: [id])
+
+  reward       QuestReward?
+
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  progress     QuestProgress[]
+}
+
+model QuestReward {
+  id          String   @id @default(cuid())
+
+  questId     String   @unique
+  quest       Quest    @relation(fields: [questId], references: [id])
+
+  xpReward    Int      @default(0)
+  coinReward  Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model QuestProgress {
+  id          String         @id @default(cuid())
+
+  characterId String
+  character   Character      @relation(fields: [characterId], references: [id])
+
+  questId     String
+  quest       Quest          @relation(fields: [questId], references: [id])
+
+  status      ProgressStatus @default(IN_PROGRESS)
+
+  completedAt DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([characterId, questId])
+}
+
+enum AchievementType {
+  QUEST
+  LEVEL
+}
+
+model Achievement {
+  id            String   @id @default(cuid())
+
+  title         String
+  description   String?
+
+  type          AchievementType
+
+  requirement   Int
+
+  characters    CharacterAchievement[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CharacterAchievement {
+  id              String   @id @default(cuid())
+
+  characterId     String
+  character       Character @relation(fields: [characterId], references: [id])
+
+  achievementId   String
+  achievement     Achievement @relation(fields: [achievementId], references: [id])
+
+  unlockedAt      DateTime @default(now())
+
+  @@unique([characterId, achievementId])
+}
