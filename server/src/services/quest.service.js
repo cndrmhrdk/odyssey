@@ -157,8 +157,130 @@ const completeQuest = async (userId,questId) => {
     return result;
 };
 
+const createQuest = async ({title, description, difficulty, regionId, xpReward, coinReward,}) => {
+    const region = await prisma.region.findUnique({
+        where: {
+            id: regionId,
+        },
+    });
+
+    if(!region) {
+        throw new Error("Region tidak ada");
+    }
+
+    const existingQuest = await prisma.quest.findFirst({
+        where: {
+            title,
+        },
+    });
+
+    if(existingQuest) {
+        throw new Error("Quest sudah ada");
+    }
+
+    const quest = await prisma.quest.create({
+        data: {
+            title,
+            description,
+            difficulty,
+            region: {
+                connect: {
+                    id: region.id,
+                },
+            },
+            reward: {
+                create: {
+                    xpReward,
+                    coinReward,
+                },
+            },
+        },
+        include: {
+            region: true,
+            reward: true,
+        },  
+    });
+
+    return quest;
+};
+
+const updateQuest = async (questId, {title, description, difficulty, regionId, xpReward, coinReward,}) => {
+    const quest = await prisma.quest.findUnique({
+        where: {
+            id: quest,
+        },
+        include: {
+            reward: true,
+        },
+    });
+
+    if(!quest) {
+        throw new Error("Quest tidak ditemukan");
+    }
+
+    const region = await prisma.region.findUnique({
+        where: {
+            id: regionId,
+        },
+    });
+
+    if(!region) {
+        throw new Error("Region tidak ditemukan");
+    }
+
+    if(title && title !== quest.title) {
+        const existingQuest = await prisma.quest.findFirst({
+            where: {
+                title,
+            },
+        });
+
+        if(existingQuest) {
+            throw new Error("Judul quest sudah digunakan");
+        }
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+        const updatedQuest = await tx.quest.update({
+            where: {
+                id: questId,
+            },
+            data: {
+                title,
+                description,
+                difficulty,
+                regionId,
+            },
+        });
+
+        await tx.questReward.update({
+            where: {
+                questId,
+            },
+            data: {
+                xpReward,
+                coinReward,
+            },
+        });
+    
+        return updatedQuest;
+    });
+
+    return prisma.quest.findUnique({
+        where: {
+            id: result.id,
+        },
+        include: {
+            region: true,
+            reward: true,
+        },
+    });
+};
+
 module.exports = {
     getAllQuests,
     startQuest,
     completeQuest,
+    createQuest,
+    updateQuest,
 };

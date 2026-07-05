@@ -47,8 +47,23 @@ const completeQuest = async (req, res, next) => {
     }
 };
 
+const createQuest = async (req, res, next) => {
+    try {
+        const quest = await questService.createQuest(req.body);
+
+        return res.status(201).json({
+            success: true,
+            message: "Quest berhasil dibuat",
+            data: quest,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     getAllQuests,
     startQuest,
     completeQuest,
+    createQuest,
 };

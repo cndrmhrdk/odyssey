@@ -19,6 +19,8 @@ const verifyToken = (req, res, next) => {
             process.env.JWT_SECRET
         );
 
+        console.log(decoded);
+
         req.user = decoded;
 
         next();
@@ -27,6 +29,25 @@ const verifyToken = (req, res, next) => {
     }
 };
 
+const authorizeRole = (...roles) => {
+    return (req, res, next) => {
+        try {
+            if(!req.user) {
+                throw new Error("User belum terautentikasi");
+            }
+
+            if(!roles.includes(req.user.role)) {
+                throw new Error("Akses ditolak");
+            }
+
+            next();
+        }  catch (error) {
+            next(error);
+        }
+    }
+}
+
 module.exports = {
     verifyToken,
+    authorizeRole,
 };

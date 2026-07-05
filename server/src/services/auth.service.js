@@ -58,7 +58,12 @@ const login = async ({ email, password })  => {
         where: {
             email,
         },
+        include: {
+            role: true,
+        },
     });
+
+    console.log(JSON.stringify(user, null, 2));
 
     if(!user) {
         throw new Error("Email atau password salah");
@@ -74,7 +79,7 @@ const login = async ({ email, password })  => {
     const token = jwt.sign(
         {
             id: user.id,
-            roleId: user.roleId,
+            role: user.role.name,
         },
         process.env.JWT_SECRET,
         {
