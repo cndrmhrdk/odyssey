@@ -218,14 +218,16 @@ const updateQuest = async (questId, {title, description, difficulty, regionId, x
         throw new Error("Quest tidak ditemukan");
     }
 
-    const region = await prisma.region.findUnique({
-        where: {
-            id: regionId,
-        },
-    });
-
-    if(!region) {
-        throw new Error("Region tidak ditemukan");
+    if(regionId) {
+        const region = await prisma.region.findUnique({
+            where: {
+                id: regionId,
+            },
+        });
+    
+        if(!region) {
+            throw new Error("Region tidak ditemukan");
+        }
     }
 
     if(title && title !== quest.title) {

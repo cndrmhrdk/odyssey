@@ -10,10 +10,12 @@ const createRegionSchema = z.object({
     .max(50, "Nama region maksimal 50 karakter"),
 
     description: z
-    .string()
+    .string({
+        error: "Deskripsi wajib diisi",
+    })
     .trim()
+    .min(5, "Deskripsi minimal 5 karakter")
     .max(255, "Deskripsi maksimal 255 karakter")
-    .optional(),
 });
 
 const updateRegionSchema = createRegionSchema.partial();
