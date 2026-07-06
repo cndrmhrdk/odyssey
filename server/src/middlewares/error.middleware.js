@@ -3,7 +3,8 @@ const errorHandler = (err, req, res, next) => {
     if (err.issues) {
         return res.status(400).json({
             success: false,
-            message: err.issues[0].message,
+            message: "Validation Error",
+            errors: err.issues.map((issue) => issue.message),
         });
     }
 
