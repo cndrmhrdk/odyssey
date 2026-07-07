@@ -14,7 +14,7 @@ const options = {
             },
         ],
         components: {
-            securitySchema: {
+            securitySchemes: {
                 bearerAuth: {
                     type: "http",
                     scheme: "bearer",
@@ -29,7 +29,9 @@ const options = {
         ],
     },
 
-    apis: ["./src/routes/*.js"],
+    apis: [
+        "src/docs/*.swagger.js",
+    ],
 };
 
 module.exports = swaggerJsdoc(options);

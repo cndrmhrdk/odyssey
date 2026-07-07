@@ -21,6 +21,7 @@ router.use("/characters", characterRoute);
 router.use("/regions", regionRoute);
 router.use("/quests", questRoute);
 router.use("/achievements", achievementRoute);
+router.use("/leaderboard", leaderboardRoute);
 router.use("/profile", profileRoute);
 
 module.exports = router;
