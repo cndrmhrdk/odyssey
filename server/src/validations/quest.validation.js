@@ -34,6 +34,13 @@ const createQuestSchema = z.object({
     })
     .int("Coin Reward harus bilangan bulat")
     .min(0, "Coin Reward tidak boleh negatif"),
+
+    coinReward: z
+    .number({
+        error: "Coin Reward wajib diisi",
+    })
+    .int("Coin Reward harus bilangan bulat")
+    .min(0, "Coin Reward tidak boleh negatif"),
 });
 
 const updateQuestSchema = createQuestSchema.partial();
