@@ -14,6 +14,45 @@ const getAllQuests = async () => {
     });
 };
 
+const getMyQuests = async (userId) => {
+    const character = await prisma.character.findUnique({
+        where: {
+            userId,
+        },
+    });
+
+    if (!character) {
+        throw new Error("Character belum dibuat");
+    }
+
+    const quests = await prisma.quest.findMany({
+        include: {
+            region: true,
+            reward: true,
+            progress: {
+                where: {
+                    characterId: character.id,
+                },
+            },
+        },
+        orderBy: {
+            createdAt: "asc",
+        },
+    });
+
+    return quests.map((quest) => ({
+        id: quest.id,
+        title: quest.title,
+        description: quest.description,
+        difficulty: quest.difficulty,
+        region: quest.region,
+        reward: quest.reward,
+
+        status:
+            quest.progress.length > 0 ? quest.progress[0].status : "NOT_STARTED",
+    }));
+};
+
 const startQuest = async (userId, questId) => {
     const character = await prisma.character.findUnique({
         where: {
@@ -317,6 +356,7 @@ const deleteQuest = async (questId) => {
 
 module.exports = {
     getAllQuests,
+    getMyQuests,
     startQuest,
     completeQuest,
     createQuest,

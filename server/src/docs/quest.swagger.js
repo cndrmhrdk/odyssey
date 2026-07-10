@@ -19,6 +19,17 @@
 /**
  * @swagger
  * /quests:
+ *  get: 
+ *      summary: Mendapatkan semua quest
+ *      tags: [Quest]
+ *      responses:
+ *          200:
+ *              description: Berhasil mendapatkan daftar quest
+ */
+
+/**
+ * @swagger
+ * /quests:
  *  post:
  *      summary: Membuat quest baru
  *      tags: [Quest]

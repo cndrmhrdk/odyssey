@@ -7,7 +7,7 @@ const createCharacter = async (req, res, next) => {
 
         const character = await characterService.createCharacter(
             req.user.id,
-            data.nickname
+            data
         );
 
         return res.status(201).json({
@@ -21,18 +21,14 @@ const createCharacter = async (req, res, next) => {
 };
 
 const getMyCharacter = async (req, res, next) => {
-    try {
-        const character = await characterService.getMyCharacter(
-            req.user.id
-        );
+    const character = await characterService.getMyCharacter(
+        req.user.id
+    );
 
-        return res.status(200).json({
-            success: true,
-            data: character,
-        });
-    } catch (error) {
-        next(error);
-    }
+    return res.status(200).json({
+        success: true,
+        data: character,
+    });
 };
 
 module.exports = {

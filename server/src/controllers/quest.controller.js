@@ -13,6 +13,19 @@ const getAllQuests = async (req, res, next) => {
     }
 };
 
+const getMyQuests = async (req, res, next) => {
+    try {
+        const quests = await questService.getMyQuests(req.user.id);
+
+        return res.status(200).json({
+            success: true,
+            data: quests,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const startQuest = async (req, res, next) => {
     try {
         const quest = await questService.startQuest(
@@ -93,6 +106,7 @@ const deleteQuest = async (req, res, next) => {
 
 module.exports = {
     getAllQuests,
+    getMyQuests,
     startQuest,
     completeQuest,
     createQuest,

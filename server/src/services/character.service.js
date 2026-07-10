@@ -1,6 +1,6 @@
 const prisma = require("../config/prisma");
 
-const createCharacter = async (userId, nickname) => {
+const createCharacter = async (userId, data) => {
     // cek punya character
     const existingCharacter = await prisma.character.findUnique({
         where: {
@@ -26,7 +26,8 @@ const createCharacter = async (userId, nickname) => {
     const character = await prisma.character.create({
         data: {
             userId,
-            nickname,
+            nickname: data.nickname,
+            avatar: data.avatar,
         },
     });
 
@@ -39,13 +40,7 @@ const getMyCharacter = async (userId) => {
             userId,
         },
     });
-
-    if(!character) {
-        throw new Error("Character belum dibuat");
-    }
-
-    return character;
-}
+};
 
 module.exports = {
     createCharacter,
