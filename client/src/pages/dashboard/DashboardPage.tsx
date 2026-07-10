@@ -56,6 +56,9 @@ const DashboardPage = () => {
                     <button onClick={handleLogout}>
                         Logout
                     </button>
+                    <button onClick={() => navigate("/achievements")}>
+                        Achievement
+                    </button>
                 </>
 
             ) : (

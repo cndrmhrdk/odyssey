@@ -5,6 +5,7 @@ import DashboardPage from "../pages/dashboard/DashboardPage";
 import ProtectedRoute from "./ProtectedRoutes";
 import CharacterPage from "../pages/character/CharacterPage";
 import QuestPage from "../pages/quest/QuestPage";
+import AchievementPage from "../pages/achievement/AchievementPage";
 
 const AppRouter = () => {
     return (
@@ -22,6 +23,10 @@ const AppRouter = () => {
                 <Route path="/quest" element={
                     <ProtectedRoute>
                         <QuestPage/>
+                    </ProtectedRoute>}/>
+                <Route path="/achievements" element={
+                    <ProtectedRoute>
+                        <AchievementPage/>
                     </ProtectedRoute>}/>
             </Routes>
         </BrowserRouter>
