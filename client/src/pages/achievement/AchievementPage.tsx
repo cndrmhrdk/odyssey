@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyAchievements } from "../../services/achievement.service";
+import MainLayout from "../../components/layout/MainLayout";
 
 interface Achievement {
     id: string;
@@ -42,7 +43,7 @@ const AchievementPage = () => {
     }
 
     return (
-        <div>
+        <MainLayout>
             <h1>My Achievements</h1>
 
             {achievements.length === 0 ? (
@@ -58,11 +59,7 @@ const AchievementPage = () => {
                     </div>
                 ))
             )}
-
-            <button onClick={() => navigate("/dashboard")}>
-                Kembali ke Dashboard
-            </button>
-        </div>
+        </MainLayout>
     );
 };
 

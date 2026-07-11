@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyQuest, startQuest, completeQuest } from "../../services/quest.service";
+import MainLayout from "../../components/layout/MainLayout";
 
 interface Quest {
     id: string;
@@ -73,7 +74,7 @@ const QuestPage = () => {
     }
 
     return (
-        <div>
+        <MainLayout>
             <h1>Quest</h1>
 
             {quests.map((quest) => (
@@ -98,11 +99,7 @@ const QuestPage = () => {
                     )}
                 </div>
             ))}
-
-            <button onClick={() => navigate("/dashboard")}>
-                Kembali ke Dashboard
-            </button>
-        </div>
+        </MainLayout>
     );
 };
 

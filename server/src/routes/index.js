@@ -8,6 +8,7 @@ const questRoute = require("./quest.route");
 const achievementRoute = require("./achievement.route");
 const leaderboardRoute = require("./leaderboard.route");
 const profileRoute = require("./profile.route");
+const adminDashboardRoute = require("./adminDashboard.route");
 
 router.get("/", (req,res) => {
 res.status(200).json({
@@ -23,5 +24,6 @@ router.use("/quests", questRoute);
 router.use("/achievements", achievementRoute);
 router.use("/leaderboard", leaderboardRoute);
 router.use("/profile", profileRoute);
+router.use("/admin/dashboard", adminDashboardRoute);
 
 module.exports = router;

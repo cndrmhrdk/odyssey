@@ -13,6 +13,19 @@ const getAllQuests = async (req, res, next) => {
     }
 };
 
+const getQuestById = async (req, res, next) => {
+    try {
+        const quest = await questService.getQuestById(req.params.id);
+
+        return res.status(200).json({
+            success: true,
+            data: quest,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const getMyQuests = async (req, res, next) => {
     try {
         const quests = await questService.getMyQuests(req.user.id);
@@ -106,6 +119,7 @@ const deleteQuest = async (req, res, next) => {
 
 module.exports = {
     getAllQuests,
+    getQuestById,
     getMyQuests,
     startQuest,
     completeQuest,

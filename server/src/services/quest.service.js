@@ -14,6 +14,17 @@ const getAllQuests = async () => {
     });
 };
 
+const getQuestById = async (id) => {
+    return prisma.quest.findUnique({
+        where: {
+            id,
+        },
+        include: {
+            reward: true,
+        },
+    });
+};
+
 const getMyQuests = async (userId) => {
     const character = await prisma.character.findUnique({
         where: {
@@ -356,6 +367,7 @@ const deleteQuest = async (questId) => {
 
 module.exports = {
     getAllQuests,
+    getQuestById,
     getMyQuests,
     startQuest,
     completeQuest,

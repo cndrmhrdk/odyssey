@@ -18,7 +18,7 @@ const LoginPage = () => {
             password,
         });
 
-        login(result.data.token);
+        await login(result.data.token);
 
         navigate("/dashboard")
 

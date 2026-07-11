@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-    getMyCharacter,
-    createCharacter,
-} from "../../services/character.service";
+import { getMyCharacter, createCharacter, } from "../../services/character.service";
 import { useNavigate } from "react-router-dom";
+import MainLayout from "../../components/layout/MainLayout";
 
 interface Character {
     id: string;
@@ -63,7 +61,7 @@ const CharacterPage = () => {
     }
     
     return (
-        <div>
+        <MainLayout>
             <h1>Character</h1>
 
             {character ? (
@@ -91,13 +89,9 @@ const CharacterPage = () => {
                     <br /><br />
 
                     <button type="submit">Create Character</button>
-
-                    <br /><br />
-
-                    <button onClick={() => navigate("/dashboard")}>Dashboard</button>
                 </form>
             )}
-        </div>
+        </MainLayout>
     );
 };
 
