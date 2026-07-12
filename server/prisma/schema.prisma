@@ -99,6 +99,13 @@ model Quest {
 
   reward       QuestReward?
 
+  question      String?
+  choiceA       String?
+  choiceB       String?
+  choiceC       String?
+  choiceD       String?
+  correctChoice String?
+
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -128,6 +135,8 @@ model QuestProgress {
   quest       Quest          @relation(fields: [questId], references: [id])
 
   status      ProgressStatus @default(IN_PROGRESS)
+
+  isCorrect   Boolean?
 
   completedAt DateTime?
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMyQuest, startQuest, completeQuest, } from "../../services/quest.service";
+import { getMyQuest, startQuest, submitAnswer, } from "../../services/quest.service";
 import MainLayout from "../../components/layout/MainLayout";
 import toast from "react-hot-toast";
 
@@ -19,12 +19,22 @@ interface Quest {
         coinReward: number;
     } | null;
 
+    question: string;
+    choiceA: string;
+    choiceB: string;
+    choiceC: string;
+    choiceD: string;
+
     status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+
+    isCorrect: boolean | null;
 }
 
 const QuestPage = () => {
     const [quests, setQuests] = useState<Quest[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
+    const [selectedAnswer, setSelectedAnswer] = useState< "A" | "B" | "C" | "D" | "" >("");
 
     const fetchQuest = async () => {
         try {
@@ -46,23 +56,61 @@ const QuestPage = () => {
         try {
             const result = await startQuest(questId);
 
-            toast.success(result.message);
+            if (result.success) {
+                toast.success(result.message);
+            } else {
+                toast.error(result.message);
+            }
 
-            fetchQuest();
+            await fetchQuest();
+
+            const quest = quests.find((q) => q.id === questId);
+
+            if (quest) {
+                setSelectedQuest({
+                    ...quest,
+                    status: "IN_PROGRESS",
+                });
+            }
+
+            setSelectedAnswer("");
         } catch (error: any) {
-            toast.error(error.response?.data?.message ?? "Gagal memulai quest");
+            toast.error(
+                error.response?.data?.message ??
+                "Gagal memulai quest"
+            );
         }
     };
 
-    const handleCompleteQuest = async (questId: string) => {
-        try {
-            const result = await completeQuest(questId);
+    const handleSubmitAnswer = async () => {
+        if (!selectedQuest) return;
 
-            toast.success(result.message);
+        if (!selectedAnswer) {
+            toast.error("Pilih jawaban terlebih dahulu");
+            return;
+        }
+
+        try {
+            const result = await submitAnswer(
+                selectedQuest.id,
+                selectedAnswer
+            );
+
+            if (result.success) {
+                toast.success(result.message);
+            } else {
+                toast.error(result.message);
+            }
+
+            setSelectedQuest(null);
+            setSelectedAnswer("");
 
             fetchQuest();
         } catch (error: any) {
-            toast.error(error.response?.data?.message ?? "Gagal menyelesaikan quest");
+            toast.error(
+                error.response?.data?.message ??
+                "Gagal mengirim jawaban"
+            );
         }
     };
 
@@ -118,6 +166,67 @@ const QuestPage = () => {
                     </p>
 
                 </div>
+                {selectedQuest && (
+                    <div className="rounded-3xl border border-cyan-500 bg-slate-900 p-8 shadow-xl">
+
+                        <h2 className="text-2xl font-bold text-cyan-400 mb-3">
+                            📝 {selectedQuest.title}
+                        </h2>
+
+                        <p className="text-slate-300 mb-6">
+                            {selectedQuest.question}
+                        </p>
+
+                        <div className="space-y-3">
+
+                            {[
+                                { key: "A", value: selectedQuest.choiceA },
+                                { key: "B", value: selectedQuest.choiceB },
+                                { key: "C", value: selectedQuest.choiceC },
+                                { key: "D", value: selectedQuest.choiceD },
+                            ].map((choice) => (
+                                <button
+                                    key={choice.key}
+                                    onClick={() =>
+                                        setSelectedAnswer(
+                                            choice.key as "A" | "B" | "C" | "D"
+                                        )
+                                    }
+                                    className={`w-full text-left rounded-xl border p-4 transition ${
+                                        selectedAnswer === choice.key
+                                            ? "border-cyan-400 bg-cyan-700"
+                                            : "border-slate-700 bg-slate-800 hover:border-cyan-500"
+                                    }`}
+                                >
+                                    <strong>{choice.key}.</strong> {choice.value}
+                                </button>
+                            ))}
+
+                        </div>
+
+                        <div className="flex gap-3 mt-8">
+
+                            <button
+                                onClick={handleSubmitAnswer}
+                                className="rounded-xl bg-green-600 px-6 py-3 font-bold hover:bg-green-500"
+                            >
+                                Submit Jawaban
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setSelectedQuest(null);
+                                    setSelectedAnswer("");
+                                }}
+                                className="rounded-xl bg-slate-700 px-6 py-3 font-bold hover:bg-slate-600"
+                            >
+                                Batal
+                            </button>
+
+                        </div>
+
+                    </div>
+                )}
 
                 {/* Quest List */}
                 <div className="grid gap-6">
@@ -186,39 +295,45 @@ const QuestPage = () => {
                                     <span
                                         className={`px-4 py-2 rounded-full text-sm font-bold text-white ${statusColor(
                                             quest.status
-                                        )}`}
-                                    >
+                                        )}`}>
                                         {quest.status.replace("_", " ")}
                                     </span>
 
                                     {quest.status === "NOT_STARTED" && (
                                         <button
-                                            onClick={() =>
-                                                handleStartQuest(quest.id)
-                                            }
-                                            className="rounded-xl bg-yellow-500 px-5 py-2 font-bold text-slate-900 hover:bg-yellow-400 transition"
-                                        >
+                                            disabled={selectedQuest !== null}
+                                            onClick={() => handleStartQuest(quest.id)}
+                                            className={`rounded-xl px-5 py-2 font-bold transition ${
+                                                selectedQuest
+                                                    ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+                                                    : "bg-yellow-500 text-slate-900 hover:bg-yellow-400"
+                                            }`}>
                                             ▶ Start Quest
                                         </button>
                                     )}
 
                                     {quest.status === "IN_PROGRESS" && (
                                         <button
-                                            onClick={() =>
-                                                handleCompleteQuest(quest.id)
-                                            }
-                                            className="rounded-xl bg-green-600 px-5 py-2 font-bold text-white hover:bg-green-500 transition"
+                                            onClick={() => {
+                                                setSelectedQuest(quest);
+                                                setSelectedAnswer("");
+                                            }}
+                                            disabled={selectedQuest !== null}
+                                            className={`rounded-xl px-5 py-2 font-bold transition ${
+                                                selectedQuest
+                                                    ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+                                                    : "bg-blue-600 text-white hover:bg-blue-500"
+                                            }`}
                                         >
-                                            ✔ Complete Quest
+                                            📖 Lanjutkan Quest
                                         </button>
                                     )}
 
                                     {quest.status === "COMPLETED" && (
                                         <button
                                             disabled
-                                            className="rounded-xl bg-slate-700 px-5 py-2 font-bold text-slate-300 cursor-not-allowed"
-                                        >
-                                            ✓ Completed
+                                            className="rounded-xl bg-slate-700 px-5 py-2 font-bold text-slate-300 cursor-not-allowed">
+                                            {quest.isCorrect ? "✅ Success" : "❌ Failed"}
                                         </button>
                                     )}
 

@@ -10,8 +10,14 @@ export const startQuest = async (id: string) => {
     return response.data;
 };
 
-export const completeQuest = async (id: string) => {
-    const response = await api.patch(`/quests/${id}/complete`);
+export const submitAnswer = async ( id: string, answer: "A" | "B" | "C" | "D" ) => {
+    const response = await api.post(
+        `/quests/${id}/answer`,
+        {
+            answer,
+        }
+    );
+
     return response.data;
 };
 

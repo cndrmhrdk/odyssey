@@ -16,6 +16,6 @@ router.post("/", verifyToken, authorizeRole("ADMIN"), validate(createQuestSchema
 router.put("/:questId", verifyToken, authorizeRole("ADMIN"), validate(updateQuestSchema), questController.updateQuest);
 router.delete("/:questId", verifyToken, authorizeRole("ADMIN"), questController.deleteQuest);
 router.post("/:questId/start", verifyToken, questController.startQuest);
-router.patch("/:questId/complete", verifyToken, questController.completeQuest);
+router.post( "/:questId/answer", verifyToken, questController.submitAnswer );
 
 module.exports = router;

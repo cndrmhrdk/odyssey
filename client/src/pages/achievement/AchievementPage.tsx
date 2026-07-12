@@ -34,7 +34,7 @@ const AchievementPage = () => {
 
     useEffect(() => {
         fetchAchievements();
-    }, []);
+    }, []);result
 
     if (loading) {
         return (

@@ -17,6 +17,13 @@ interface Quest {
         xpReward: number;
         coinReward: number;
     } | null;
+    
+    question: string;
+    choiceA: string;
+    choiceB: string;
+    choiceC: string;
+    choiceD: string;
+    correctChoice: string;
 }
 
 const AdminQuestPage = () => {

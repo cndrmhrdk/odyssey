@@ -56,17 +56,18 @@ const startQuest = async (req, res, next) => {
     }
 };
 
-const completeQuest = async (req, res, next) => {
+const submitAnswer = async (req, res, next) => {
     try {
-        const result = await questService.completeQuest(
+        const result = await questService.submitAnswer(
             req.user.id,
             req.params.questId,
+            req.body.answer,
         );
 
         return res.status(200).json({
-            success: true,
-            message: "Quest selesai",
-            data: result,
+            success: result.success,
+            message: result.message,
+            data: result.data ?? null,
         });
     } catch (error) {
         next(error);
@@ -122,7 +123,7 @@ module.exports = {
     getQuestById,
     getMyQuests,
     startQuest,
-    completeQuest,
+    submitAnswer,
     createQuest,
     updateQuest,
     deleteQuest,

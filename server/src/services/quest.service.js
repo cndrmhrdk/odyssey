@@ -21,6 +21,7 @@ const getQuestById = async (id) => {
         },
         include: {
             reward: true,
+            region: true,
         },
     });
 };
@@ -59,8 +60,16 @@ const getMyQuests = async (userId) => {
         region: quest.region,
         reward: quest.reward,
 
+        question: quest.question,
+        choiceA: quest.choiceA,
+        choiceB: quest.choiceB,
+        choiceC: quest.choiceC,
+        choiceD: quest.choiceD,
+
         status:
             quest.progress.length > 0 ? quest.progress[0].status : "NOT_STARTED",
+
+        isCorrect: quest.progress.length > 0 ? quest.progress[0].isCorrect : null,
     }));
 };
 
@@ -109,14 +118,14 @@ const startQuest = async (userId, questId) => {
     return progress;
 };
 
-const completeQuest = async (userId,questId) => {
+const submitAnswer = async (userId, questId, answer) => {
     const character = await prisma.character.findUnique({
         where: {
             userId,
         },
     });
 
-    if(!character) {
+    if (!character) {
         throw new Error("Character belum dibuat");
     }
 
@@ -129,13 +138,12 @@ const completeQuest = async (userId,questId) => {
         },
     });
 
-
-    if(!progress) {
+    if (!progress) {
         throw new Error("Quest belum dimulai");
     }
 
-    if(progress.status === "COMPLETED") {
-        throw new Error("Quest telah diselesaikan");
+    if (progress.status === "COMPLETED") {
+        throw new Error("Quest sudah selesai");
     }
 
     const quest = await prisma.quest.findUnique({
@@ -147,12 +155,31 @@ const completeQuest = async (userId,questId) => {
         },
     });
 
-    if(!quest) {
+    if (!quest) {
         throw new Error("Quest tidak ditemukan");
     }
 
-    if(!quest.reward) {
-        throw new Error("Reward quest belum tersedia");
+    const isCorrect = answer === quest.correctChoice;
+
+    if (!isCorrect) {
+        await prisma.questProgress.update({
+            where: {
+                characterId_questId: {
+                    characterId: character.id,
+                    questId,
+                },
+            },
+            data: {
+                status: "COMPLETED",
+                isCorrect: false,
+                completedAt: new Date(),
+            },
+        });
+
+        return {
+            success: false,
+            message: "Jawaban salah. Quest selesai.",
+        };
     }
 
     const result = await prisma.$transaction(async (tx) => {
@@ -170,20 +197,20 @@ const completeQuest = async (userId,questId) => {
             },
         });
 
-        const newLevel = calculateLevel(updatedCharacter.xp);
+        const level = calculateLevel(updatedCharacter.xp);
 
-        if(newLevel > updatedCharacter.level) {
+        if (level > updatedCharacter.level) {
             await tx.character.update({
                 where: {
                     id: character.id,
                 },
                 data: {
-                    level: newLevel,
+                    level,
                 },
             });
         }
 
-        const updatedProgress = await tx.questProgress.update({
+        await tx.questProgress.update({
             where: {
                 characterId_questId: {
                     characterId: character.id,
@@ -192,22 +219,37 @@ const completeQuest = async (userId,questId) => {
             },
             data: {
                 status: "COMPLETED",
+                isCorrect: true,
                 completedAt: new Date(),
             },
         });
 
-        return {
-            character: updatedCharacter,
-            progress: updatedProgress,
-        };
+        return updatedCharacter;
     });
 
     await achievementService.checkQuestAchievement(character.id);
 
-    return result;
+    return {
+        success: true,
+        message: "Jawaban benar!",
+        data: result,
+    };
 };
 
-const createQuest = async ({title, description, difficulty, regionId, xpReward, coinReward,}) => {
+const createQuest = async ({
+    title,
+    description,
+    difficulty,
+    regionId,
+    xpReward,
+    coinReward,
+    question,
+    choiceA,
+    choiceB,
+    choiceC,
+    choiceD,
+    correctChoice,
+}) => {
     const region = await prisma.region.findUnique({
         where: {
             id: regionId,
@@ -233,6 +275,12 @@ const createQuest = async ({title, description, difficulty, regionId, xpReward, 
             title,
             description,
             difficulty,
+            question,
+            choiceA,
+            choiceB,
+            choiceC,
+            choiceD,
+            correctChoice,
             region: {
                 connect: {
                     id: region.id,
@@ -254,7 +302,20 @@ const createQuest = async ({title, description, difficulty, regionId, xpReward, 
     return quest;
 };
 
-const updateQuest = async (questId, {title, description, difficulty, regionId, xpReward, coinReward,}) => {
+const updateQuest = async (questId, {
+    title,
+    description,
+    difficulty,
+    regionId,
+    xpReward,
+    coinReward,
+    question,
+    choiceA,
+    choiceB,
+    choiceC,
+    choiceD,
+    correctChoice,
+}) => {
     const quest = await prisma.quest.findUnique({
         where: {
             id: questId,
@@ -302,6 +363,12 @@ const updateQuest = async (questId, {title, description, difficulty, regionId, x
                 description,
                 difficulty,
                 regionId,
+                question,
+                choiceA,
+                choiceB,
+                choiceC,
+                choiceD,
+                correctChoice,
             },
         });
 
@@ -370,7 +437,7 @@ module.exports = {
     getQuestById,
     getMyQuests,
     startQuest,
-    completeQuest,
+    submitAnswer,
     createQuest,
     updateQuest,
     deleteQuest,

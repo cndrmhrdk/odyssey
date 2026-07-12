@@ -19,6 +19,13 @@ const AdminCreateQuestPage = () => {
     const [description, setDescription] = useState("");
     const [difficulty, setDifficulty] = useState("EASY");
     const [regionId, setRegionId] = useState("");
+    
+    const [question, setQuestion] = useState("");
+    const [choiceA, setChoiceA] = useState("");
+    const [choiceB, setChoiceB] = useState("");
+    const [choiceC, setChoiceC] = useState("");
+    const [choiceD, setChoiceD] = useState("");
+    const [correctChoice, setCorrectChoice] = useState("A");
 
     const [xpReward, setXpReward] = useState(0);
     const [coinReward, setCoinReward] = useState(0);
@@ -50,6 +57,12 @@ const AdminCreateQuestPage = () => {
                 regionId,
                 xpReward: Number(xpReward),
                 coinReward: Number(coinReward),
+                question,
+                choiceA,
+                choiceB,
+                choiceC,
+                choiceD,
+                correctChoice,
             });
 
             toast.success("Quest berhasil dibuat");
@@ -205,20 +218,77 @@ const AdminCreateQuestPage = () => {
                     </div>
 
                 </div>
+                <div className="mt-8 border-t border-slate-700 pt-8">
+                    <h2 className="text-2xl font-bold text-cyan-300 mb-6">
+                        Quiz Question
+                    </h2>
+                    <div className="space-y-5">
+                        <div>
+                            <label className="block text-cyan-300 mb-2">
+                                Question
+                            </label>
 
+                            <textarea
+                                rows={3}
+                                value={question}
+                                onChange={(e) => setQuestion(e.target.value)}
+                                className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"
+                                placeholder="Masukkan pertanyaan..."/>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-5">
+
+                            <input
+                                value={choiceA}
+                                onChange={(e) => setChoiceA(e.target.value)}
+                                className="rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"
+                                placeholder="Pilihan A"/>
+
+                            <input
+                                value={choiceB}
+                                onChange={(e) => setChoiceB(e.target.value)}
+                                className="rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"
+                                placeholder="Pilihan B"/>
+
+                            <input
+                                value={choiceC}
+                                onChange={(e) => setChoiceC(e.target.value)}
+                                className="rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"
+                                placeholder="Pilihan C"/>
+
+                            <input
+                                value={choiceD}
+                                onChange={(e) => setChoiceD(e.target.value)}
+                                className="rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"
+                                placeholder="Pilihan D"/>
+                        </div>
+                        <div>
+                            <label className="block text-cyan-300 mb-2">
+                                Correct Answer
+                            </label>
+                            <select
+                                value={correctChoice}
+                                onChange={(e) => setCorrectChoice(e.target.value)}
+                                className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div className="flex justify-end gap-4 mt-10">
 
                     <button
                         onClick={() => navigate("/admin/quests")}
-                        className="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition"
-                    >
+                        className="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition">
                         Cancel
                     </button>
 
                     <button
                         onClick={handleSubmit}
-                        className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold transition"
-                    >
+                        className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold transition">
                         ➕ Create Quest
                     </button>
 

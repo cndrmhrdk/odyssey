@@ -23,6 +23,12 @@ const AdminEditQuestPage = () => {
     const [regionId, setRegionId] = useState("");
     const [xpReward, setXpReward] = useState(0);
     const [coinReward, setCoinReward] = useState(0);
+    const [question, setQuestion] = useState("");
+    const [choiceA, setChoiceA] = useState("");
+    const [choiceB, setChoiceB] = useState("");
+    const [choiceC, setChoiceC] = useState("");
+    const [choiceD, setChoiceD] = useState("");
+    const [correctChoice, setCorrectChoice] = useState("A");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,6 +46,12 @@ const AdminEditQuestPage = () => {
                 setRegionId(quest.region.id);
                 setXpReward(quest.reward.xpReward);
                 setCoinReward(quest.reward.coinReward);
+                setQuestion(quest.question ?? "");
+                setChoiceA(quest.choiceA ?? "");
+                setChoiceB(quest.choiceB ?? "");
+                setChoiceC(quest.choiceC ?? "");
+                setChoiceD(quest.choiceD ?? "");
+                setCorrectChoice(quest.correctChoice ?? "A");
             } catch (error) {
                 console.error(error);
                 toast.error("Gagal mengambil data quest");
@@ -58,6 +70,12 @@ const AdminEditQuestPage = () => {
                 regionId,
                 xpReward,
                 coinReward,
+                question,
+                choiceA,
+                choiceB,
+                choiceC,
+                choiceD,
+                correctChoice,
             });
 
             toast.success("Quest berhasil diperbarui");
@@ -202,33 +220,90 @@ const AdminEditQuestPage = () => {
                             value={coinReward}
                             onChange={(e) =>
                                 setCoinReward(Number(e.target.value))
-                            }
-                        />
-
+                            }/>
                     </div>
-
                 </div>
-
+                <div className="mt-10 border-t border-slate-700 pt-8">
+                    <h2 className="text-2xl font-bold text-cyan-300 mb-6">
+                        Quiz Question
+                    </h2>
+                    <div>
+                        <label className="block text-cyan-300 mb-2">
+                            Question
+                        </label>
+                        <textarea
+                            rows={3}
+                            value={question}
+                            onChange={(e) => setQuestion(e.target.value)}
+                            className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white resize-none"/>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-5 mt-6">
+                        <div>
+                            <label className="block text-cyan-300 mb-2">
+                                Choice A
+                            </label>
+                            <input
+                                value={choiceA}
+                                onChange={(e) => setChoiceA(e.target.value)}
+                                className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"/>
+                        </div>
+                        <div>
+                            <label className="block text-cyan-300 mb-2">
+                                Choice B
+                            </label>
+                            <input
+                                value={choiceB}
+                                onChange={(e) => setChoiceB(e.target.value)}
+                                className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"/>
+                        </div>
+                        <div>
+                            <label className="block text-cyan-300 mb-2">
+                                Choice C
+                            </label>
+                            <input
+                                value={choiceC}
+                                onChange={(e) => setChoiceC(e.target.value)}
+                                className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"/>
+                        </div>
+                        <div>
+                            <label className="block text-cyan-300 mb-2">
+                                Choice D
+                            </label>
+                            <input
+                                value={choiceD}
+                                onChange={(e) => setChoiceD(e.target.value)}
+                                className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white"
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-6">
+                        <label className="block text-cyan-300 mb-2">
+                            Correct Answer
+                        </label>
+                        <select
+                            value={correctChoice}
+                            onChange={(e) => setCorrectChoice(e.target.value)}
+                            className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-white">
+                            <option value="A">Choice A</option>
+                            <option value="B">Choice B</option>
+                            <option value="C">Choice C</option>
+                            <option value="D">Choice D</option>
+                        </select>
+                    </div>
+                </div>
                 <div className="flex justify-end gap-4 mt-10">
-
                     <button
                         onClick={() => navigate("/admin/quests")}
-                        className="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition"
-                    >
+                        className="px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition">
                         Cancel
                     </button>
-
                     <button
                         onClick={handleSubmit}
-                        className="px-8 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold transition"
-                    >
+                        className="px-8 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold transition">
                         💾 Update Quest
                     </button>
-
                 </div>
-
             </div>
-
         </AdminLayout>
     );
 };

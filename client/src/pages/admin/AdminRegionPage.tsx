@@ -53,14 +53,22 @@ const AdminRegionPage = () => {
                     description,
                 });
 
-                toast.success(result.message);
+                if (result.success) {
+                    toast.success(result.message);
+                } else {
+                    toast.error(result.message);
+                }
             } else {
                 const result = await createRegion({
                     name,
                     description,
                 });
 
-                toast.success(result.message);
+                if (result.success) {
+                    toast.success(result.message);
+                } else {
+                    toast.error(result.message);
+                }
             }
 
             resetForm();
@@ -82,7 +90,11 @@ const AdminRegionPage = () => {
         try {
             const result = await deleteRegion(id);
 
-            toast.success(result.message);
+            if (result.success) {
+                toast.success(result.message);
+            } else {
+                toast.error(result.message);
+            }
 
             fetchRegions();
         } catch (error: any) {
