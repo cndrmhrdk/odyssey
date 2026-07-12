@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { getRegions, createRegion, updateRegion, deleteRegion, } from "../../services/adminRegion.service";
-import { useNavigate } from "react-router-dom";
-import MainLayout from "../../components/layout/MainLayout";
+import { getRegions, createRegion, updateRegion, deleteRegion, } from "../../services/region.service";
+import AdminLayout from "../../components/layout/AdminLayout";
+import toast from "react-hot-toast";
 
 interface Region {
     id: string;
@@ -10,8 +10,6 @@ interface Region {
 }
 
 const AdminRegionPage = () => {
-    const navigate = useNavigate();
-
     const [regions, setRegions] = useState<Region[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -26,7 +24,7 @@ const AdminRegionPage = () => {
             setRegions(result.data);
         } catch (error) {
             console.error(error);
-            alert("Gagal mengambil region");
+            toast.error("Gagal mengambil region");
         } finally {
             setLoading(false);
         }
@@ -44,7 +42,7 @@ const AdminRegionPage = () => {
 
     const handleSubmit = async () => {
         if (!name.trim()) {
-            alert("Nama region wajib diisi");
+            toast.error("Nama region wajib diisi");
             return;
         }
 
@@ -55,20 +53,20 @@ const AdminRegionPage = () => {
                     description,
                 });
 
-                alert(result.message);
+                toast.success(result.message);
             } else {
                 const result = await createRegion({
                     name,
                     description,
                 });
 
-                alert(result.message);
+                toast.success(result.message);
             }
 
             resetForm();
             fetchRegions();
         } catch (error: any) {
-            alert(error.response?.data?.message ?? "Terjadi kesalahan");
+            toast.error(error.response?.data?.message ?? "Terjadi kesalahan");
         }
     };
 
@@ -79,66 +77,189 @@ const AdminRegionPage = () => {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Yakin ingin menghapus region ini?")) {
-            return;
-        }
+        if (!confirm("Yakin ingin menghapus region ini?")) return;
 
         try {
             const result = await deleteRegion(id);
 
-            alert(result.message);
+            toast.success(result.message);
 
             fetchRegions();
         } catch (error: any) {
-            alert(error.response?.data?.message ?? "Gagal menghapus");
+            toast.error(error.response?.data?.message ?? "Gagal menghapus");
         }
     };
 
     if (loading) {
-        return <p>Loading...</p>;
+        return (
+            <AdminLayout>
+                <p className="text-white">Loading...</p>
+            </AdminLayout>
+        );
     }
 
     return (
-        <MainLayout>
-            <h1>Manage Region</h1>
+        <AdminLayout>
 
-            <div style={{ border: "1px solid gray", padding: "16px", marginBottom: "24px", borderRadius: "8px", }} >
-                <h2> {editingId ? "Edit Region" : "Tambah Region"} </h2>
+            <div className="mb-8">
 
-                <input type="text" placeholder="Nama Region" value={name} onChange={(e) => setName(e.target.value)} />
+                <h1 className="text-4xl font-black text-cyan-300">
+                    🌍 World Management
+                </h1>
 
-                <br />
-                <br />
+                <p className="mt-2 text-slate-400">
+                    Manage every region inside Code Odyssey.
+                </p>
 
-                <textarea placeholder="Deskripsi" value={description} onChange={(e) => setDescription(e.target.value) } />
-
-                <br />
-                <br />
-
-                <button onClick={handleSubmit}>
-                    {editingId ? "Update Region" : "Tambah Region"}
-                </button>
-
-                {editingId && (
-                    <>
-                        {" "}
-                        <button onClick={resetForm}> Batal </button>
-                    </>
-                )}
             </div>
 
-            <h2>Daftar Region</h2>
+            <div className="grid gap-8 xl:grid-cols-3">
 
-            {regions.map((region) => (
-                <div key={region.id} style={{ border: "1px solid gray", padding: "16px", marginBottom: "16px", borderRadius: "8px", }} >
-                    <h3>{region.name}</h3>
-                    <p>{region.description}</p>
-                    <button onClick={() => handleEdit(region)} > Edit </button>
-                    {" "}
-                    <button onClick={() => handleDelete(region.id)} > Delete </button>
+                {/* FORM */}
+
+                <div className="rounded-3xl bg-slate-900 p-6 shadow-xl border border-cyan-500/20">
+
+                    <h2 className="mb-6 text-2xl font-bold text-white">
+
+                        {editingId
+                            ? "✏ Edit Region"
+                            : "➕ Create Region"}
+
+                    </h2>
+
+                    <div className="space-y-5">
+
+                        <div>
+
+                            <label className="mb-2 block text-sm text-slate-300">
+                                Region Name
+                            </label>
+
+                            <input
+                                value={name}
+                                onChange={(e) =>
+                                    setName(e.target.value)
+                                }
+                                placeholder="Forest of Dawn"
+                                className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white outline-none focus:border-cyan-400"
+                            />
+
+                        </div>
+
+                        <div>
+
+                            <label className="mb-2 block text-sm text-slate-300">
+                                Description
+                            </label>
+
+                            <textarea
+                                rows={6}
+                                value={description}
+                                onChange={(e) =>
+                                    setDescription(e.target.value)
+                                }
+                                placeholder="Write region description..."
+                                className="w-full rounded-xl border border-slate-700 bg-slate-800 p-3 text-white outline-none focus:border-cyan-400"
+                            />
+
+                        </div>
+
+                        <button
+                            onClick={handleSubmit}
+                            className="w-full rounded-xl bg-cyan-500 py-3 font-bold text-slate-900 transition hover:bg-cyan-400"
+                        >
+                            {editingId
+                                ? "Update Region"
+                                : "Create Region"}
+                        </button>
+
+                        {editingId && (
+                            <button
+                                onClick={resetForm}
+                                className="w-full rounded-xl border border-slate-600 py-3 text-white hover:bg-slate-800"
+                            >
+                                Cancel
+                            </button>
+                        )}
+
+                    </div>
+
                 </div>
-            ))}
-        </MainLayout>
+
+                {/* LIST */}
+
+                <div className="xl:col-span-2">
+
+                    <div className="mb-5 flex items-center justify-between">
+
+                        <h2 className="text-2xl font-bold text-white">
+                            Existing Regions
+                        </h2>
+
+                        <div className="rounded-full bg-cyan-500 px-4 py-2 font-bold text-slate-900">
+                            {regions.length} Regions
+                        </div>
+
+                    </div>
+
+                    <div className="space-y-5">
+
+                        {regions.map((region) => (
+
+                            <div
+                                key={region.id}
+                                className="rounded-2xl border border-slate-700 bg-slate-900 p-6 transition hover:border-cyan-400"
+                            >
+
+                                <div className="flex items-start justify-between">
+
+                                    <div>
+
+                                        <h3 className="text-2xl font-bold text-cyan-300">
+                                            🌍 {region.name}
+                                        </h3>
+
+                                        <p className="mt-3 text-slate-400">
+                                            {region.description}
+                                        </p>
+
+                                    </div>
+
+                                    <div className="flex gap-3">
+
+                                        <button
+                                            onClick={() =>
+                                                handleEdit(region)
+                                            }
+                                            className="rounded-lg bg-yellow-500 px-4 py-2 font-semibold text-black hover:bg-yellow-400"
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(region.id)
+                                            }
+                                            className="rounded-lg bg-red-500 px-4 py-2 font-semibold hover:bg-red-400"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        ))}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </AdminLayout>
     );
 };
 

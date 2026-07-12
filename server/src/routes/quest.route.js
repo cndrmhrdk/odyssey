@@ -10,8 +10,8 @@ const validate = require("../middlewares/validation.middleware");
 const { createQuestSchema, updateQuestSchema } = require("../validations/quest.validation");
 
 router.get("/", questController.getAllQuests);
-router.get( "/:id", verifyToken, questController.getQuestById );
 router.get("/my", verifyToken, questController.getMyQuests);
+router.get( "/:id", verifyToken, questController.getQuestById );
 router.post("/", verifyToken, authorizeRole("ADMIN"), validate(createQuestSchema), questController.createQuest);
 router.put("/:questId", verifyToken, authorizeRole("ADMIN"), validate(updateQuestSchema), questController.updateQuest);
 router.delete("/:questId", verifyToken, authorizeRole("ADMIN"), questController.deleteQuest);

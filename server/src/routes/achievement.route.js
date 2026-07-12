@@ -9,6 +9,7 @@ const { createAchievementSchema, updateAchievementSchema } = require("../validat
 
 router.get("/", achievementController.getAllAchievements);
 router.get("/my", verifyToken, achievementController.getMyAchievements);
+router.get( "/:id", verifyToken, authorizeRole("ADMIN"), achievementController.getAchievementById );
 router.post("/", verifyToken, authorizeRole("ADMIN"), validate(createAchievementSchema), achievementController.createAchievement);
 router.put("/:id", verifyToken, authorizeRole("ADMIN"), validate(updateAchievementSchema), achievementController.updateAchievement);
 router.delete("/:id", verifyToken, authorizeRole("ADMIN"), achievementController.deleteAchievement);

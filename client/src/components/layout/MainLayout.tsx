@@ -1,104 +1,31 @@
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 
 interface Props {
     children: ReactNode;
 }
 
 const MainLayout = ({ children }: Props) => {
-    const navigate = useNavigate();
-    const { user, logout } = useAuth();
-
-    const handleLogout = () => {
-        logout();
-        navigate("/");
-    };
-
-    if (!user) {
-        return <p>Loading...</p>;
-    }
-
     return (
-        <div style={{ display: "flex", minHeight: "100vh", }} >
-            <aside style={{ width: "260px", padding: "24px", borderRight: "1px solid #ddd", }} >
-                <h2>Code Odyssey</h2>
+        <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-black text-white">
 
-                <hr />
+            <Navbar />
 
-                <button onClick={() => navigate("/dashboard")}>
-                    Dashboard
-                </button>
+            <div className="flex">
 
-                <br />
-                <br />
+                <Sidebar />
 
-                {user.role.name === "ADMIN" ? (
-                    <>
-                        <button onClick={() => navigate("/admin/regions")}>
-                            Manage Region
-                        </button>
+                <main className="flex-1 p-8">
 
-                        <br />
-                        <br />
+                    <div className="min-h-[calc(100vh-110px)] rounded-3xl border border-slate-700 bg-slate-900/50 backdrop-blur-md shadow-2xl p-8">
+                        {children}
+                    </div>
 
-                        <button onClick={() => navigate("/admin/quests")}>
-                            Manage Quest
-                        </button>
+                </main>
 
-                        <br />
-                        <br />
+            </div>
 
-                        <button onClick={() => navigate("/admin/achievements")}>
-                            Manage Achievement
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <button onClick={() => navigate("/character")}>
-                            Character
-                        </button>
-
-                        <br />
-                        <br />
-
-                        <button onClick={() => navigate("/quest")}>
-                            Quest
-                        </button>
-
-                        <br />
-                        <br />
-
-                        <button onClick={() => navigate("/achievements")}>
-                            Achievement
-                        </button>
-
-                        <br />
-                        <br />
-
-                        <button onClick={() => navigate("/leaderboard")}>
-                            Leaderboard
-                        </button>
-
-                        <br />
-                        <br />
-
-                        <button onClick={() => navigate("/profile")}>
-                            Profile
-                        </button>
-                    </>
-                )}
-
-                <hr />
-
-                <button onClick={handleLogout}>
-                    Logout
-                </button>
-            </aside>
-
-            <main style={{ flex: 1, padding: "32px", }} >
-                {children}
-            </main>
         </div>
     );
 };

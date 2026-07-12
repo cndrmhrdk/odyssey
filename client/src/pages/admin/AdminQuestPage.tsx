@@ -1,22 +1,15 @@
 import { useEffect, useState } from "react";
-import { createQuest, getQuests, updateQuest, deleteQuest, } from "../../services/adminQuest.service";
-import { getRegions } from "../../services/adminRegion.service";
+import AdminLayout from "../../components/layout/AdminLayout";
+import { getAllQuest, deleteQuest, } from "../../services/quest.service";
 import { useNavigate } from "react-router-dom";
-import MainLayout from "../../components/layout/MainLayout";
-
-interface Region {
-    id: string;
-    name: string;
-}
+import toast from "react-hot-toast";
 
 interface Quest {
     id: string;
     title: string;
-    description: string;
     difficulty: string;
 
     region: {
-        id: string;
         name: string;
     };
 
@@ -30,207 +23,201 @@ const AdminQuestPage = () => {
     const navigate = useNavigate();
 
     const [quests, setQuests] = useState<Quest[]>([]);
-    const [regions, setRegions] = useState<Region[]>([]);
 
-    const [loading, setLoading] = useState(true);
-
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [difficulty, setDifficulty] = useState("EASY");
-    const [regionId, setRegionId] = useState("");
-    const [xpReward, setXpReward] = useState(0);
-    const [coinReward, setCoinReward] = useState(0);
-
-    const fetchData = async () => {
+    const loadQuest = async () => {
         try {
-            const questResult = await getQuests();
-            const regionResult = await getRegions();
-
-            setQuests(questResult.data);
-            setRegions(regionResult.data);
-
-            if (regionResult.data.length > 0) {
-                setRegionId(regionResult.data[0].id);
-            }
+            const result = await getAllQuest();
+            setQuests(result.data);
         } catch (error) {
             console.error(error);
-            alert("Gagal mengambil data");
-        } finally {
-            setLoading(false);
+            toast.error("Gagal mengambil quest");
         }
     };
 
     useEffect(() => {
-        fetchData();
+        loadQuest();
     }, []);
 
-    const handleSubmit = async () => {
-        try {
-            let result;
-
-            if (editingId) {
-                result = await updateQuest(editingId, {
-                    title,
-                    description,
-                    difficulty,
-                    regionId,
-                    xpReward,
-                    coinReward,
-                });
-            } else {
-                result = await createQuest({
-                    title,
-                    description,
-                    difficulty,
-                    regionId,
-                    xpReward,
-                    coinReward,
-                });
-            }
-
-            alert(result.message);
-
-            setEditingId(null);
-            setTitle("");
-            setDescription("");
-            setDifficulty("EASY");
-            setXpReward(0);
-            setCoinReward(0);
-
-            fetchData();
-        } catch (error: any) {
-            alert(error.response?.data?.message ?? "Terjadi kesalahan");
-        }
-    };
-
-    const handleEdit = (quest: Quest) => {
-        setEditingId(quest.id);
-
-        setTitle(quest.title);
-        setDescription(quest.description);
-
-        setDifficulty(quest.difficulty);
-
-        setRegionId(quest.region.id);
-
-        setXpReward(quest.reward?.xpReward ?? 0);
-        setCoinReward(quest.reward?.coinReward ?? 0);
-    };
-
     const handleDelete = async (id: string) => {
-        if (!confirm("Yakin ingin menghapus quest?")) {
-            return;
-        }
+        if (!confirm("Hapus quest ini?")) return;
 
         try {
-            const result = await deleteQuest(id);
-
-            alert(result.message);
-
-            fetchData();
-        } catch (error: any) {
-            alert(error.response?.data?.message ?? "Gagal menghapus");
+            await deleteQuest(id);
+            loadQuest();
+        } catch (error) {
+            toast.error("Gagal menghapus quest");
         }
     };
 
-    if (loading) {
-        return <p>Loading...</p>;
-    }
+    const difficultyColor = (difficulty: string) => {
+        switch (difficulty.toUpperCase()) {
+            case "EASY":
+                return "bg-green-500";
+            case "MEDIUM":
+                return "bg-yellow-500";
+            case "HARD":
+                return "bg-red-500";
+            default:
+                return "bg-slate-500";
+        }
+    };
 
     return (
-        <MainLayout>
-            <h1>Manage Quest</h1>
+        <AdminLayout>
 
-            <hr />
+            {/* HEADER */}
 
-            <h2>Tambah Quest</h2>
+            <div className="mb-8 flex items-center justify-between">
 
-            <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                <div>
 
-            <br />
-            <br />
+                    <h1 className="text-4xl font-black text-cyan-300">
+                        📜 Mission Board
+                    </h1>
 
-            <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                    <p className="mt-2 text-slate-400">
+                        Manage every quest inside Code Odyssey.
+                    </p>
 
-            <br />
-            <br />
+                </div>
 
-            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} >
-                <option value="EASY">Easy</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HARD">Hard</option>
-            </select>
+                <button
+                    onClick={() => navigate("/admin/quests/new")}
+                    className="rounded-xl bg-cyan-500 px-6 py-3 font-bold text-slate-900 transition hover:bg-cyan-400"
+                >
+                    + Create Quest
+                </button>
 
-            <br />
-            <br />
+            </div>
 
-            <select value={regionId} onChange={(e) => setRegionId(e.target.value)} >
-                {regions.map((region) => (
-                    <option key={region.id} value={region.id}>
-                        {region.name}
-                    </option>
+            {/* TOTAL */}
+
+            <div className="mb-6 inline-flex rounded-full bg-cyan-500 px-5 py-2 font-bold text-slate-900">
+                Total Quest : {quests.length}
+            </div>
+
+            {/* QUEST LIST */}
+
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+
+                {quests.map((quest) => (
+
+                    <div
+                        key={quest.id}
+                        className="rounded-3xl border border-slate-700 bg-slate-900 p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:shadow-2xl"
+                    >
+
+                        {/* Title */}
+
+                        <div className="flex items-start justify-between">
+
+                            <div>
+
+                                <h2 className="text-2xl font-bold text-cyan-300">
+                                    {quest.title}
+                                </h2>
+
+                                <p className="mt-2 text-slate-400">
+                                    🌍 {quest.region.name}
+                                </p>
+
+                            </div>
+
+                            <span
+                                className={`rounded-full px-3 py-1 text-sm font-bold text-white ${difficultyColor(
+                                    quest.difficulty
+                                )}`}
+                            >
+                                {quest.difficulty}
+                            </span>
+
+                        </div>
+
+                        {/* Reward */}
+
+                        <div className="mt-8 rounded-2xl bg-slate-800 p-4">
+
+                            <p className="mb-3 text-sm text-slate-400">
+                                Reward
+                            </p>
+
+                            <div className="flex justify-between">
+
+                                <div>
+
+                                    <p className="text-xs text-slate-500">
+                                        XP
+                                    </p>
+
+                                    <p className="text-xl font-bold text-cyan-300">
+                                        {quest.reward?.xpReward ?? 0}
+                                    </p>
+
+                                </div>
+
+                                <div>
+
+                                    <p className="text-xs text-slate-500">
+                                        Coin
+                                    </p>
+
+                                    <p className="text-xl font-bold text-yellow-400">
+                                        {quest.reward?.coinReward ?? 0}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {/* Action */}
+
+                        <div className="mt-6 flex gap-3">
+
+                            <button
+                                onClick={() =>
+                                    navigate(`/admin/quests/${quest.id}/edit`)
+                                }
+                                className="flex-1 rounded-xl bg-yellow-500 py-3 font-bold text-black transition hover:bg-yellow-400"
+                            >
+                                ✏ Edit
+                            </button>
+
+                            <button
+                                onClick={() => handleDelete(quest.id)}
+                                className="flex-1 rounded-xl bg-red-500 py-3 font-bold transition hover:bg-red-400"
+                            >
+                                🗑 Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
                 ))}
-            </select>
 
-            <br />
-            <br />
+            </div>
 
-            <input type="number" placeholder="XP Reward" value={xpReward} onChange={(e) => setXpReward(Number(e.target.value))} />
+            {quests.length === 0 && (
+                <div className="mt-12 rounded-3xl border border-dashed border-slate-700 p-12 text-center">
 
-            <br />
-            <br />
+                    <div className="text-6xl">
+                        📜
+                    </div>
 
-            <input type="number" placeholder="Coin Reward" value={coinReward} onChange={(e) => setCoinReward(Number(e.target.value))} />
+                    <h2 className="mt-4 text-2xl font-bold text-white">
+                        No Quest Available
+                    </h2>
 
-            <br />
-            <br />
+                    <p className="mt-2 text-slate-400">
+                        Create your first quest to start building your world.
+                    </p>
 
-            <button onClick={handleSubmit}> {editingId ? "Update Quest" : "Tambah Quest"} </button>
-
-            {editingId && (
-                <>
-                    {" "}
-                    <button
-                        onClick={() => {
-                            setEditingId(null);
-                            setTitle("");
-                            setDescription("");
-                            setDifficulty("EASY");
-                            setXpReward(0);
-                            setCoinReward(0);
-                        }}>
-                        Batal
-                    </button>
-                </>
+                </div>
             )}
 
-            <hr />
-
-            <h2>Daftar Quest</h2>
-
-            {quests.map((quest) => (
-                <div key={quest.id} style={{ border: "1px solid gray", padding: "16px", marginBottom: "16px", }} >
-                    <h3>{quest.title}</h3>
-
-                    <p>{quest.description}</p>
-
-                    <p>Region : {quest.region.name}</p>
-
-                    <p>Difficulty : {quest.difficulty}</p>
-
-                    <p>XP : {quest.reward?.xpReward}</p>
-
-                    <p>Coin : {quest.reward?.coinReward}</p>
-
-                    <button onClick={() => handleEdit(quest)}> Edit </button>
-
-                    {" "}
-
-                    <button onClick={() => handleDelete(quest.id)}> Delete </button>
-                </div>
-            ))}
-        </MainLayout>
+        </AdminLayout>
     );
 };
 

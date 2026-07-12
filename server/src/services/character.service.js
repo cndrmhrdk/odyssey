@@ -15,7 +15,7 @@ const createCharacter = async (userId, data) => {
     // cek nickname
     const existingNickname = await prisma.character.findUnique({
         where: {
-            nickname,
+            nickname: data.nickname,
         },
     });
 
@@ -34,12 +34,16 @@ const createCharacter = async (userId, data) => {
     return character;
 };
 
+
+
 const getMyCharacter = async (userId) => {
     const character = await prisma.character.findUnique({
         where: {
             userId,
         },
     });
+
+    return character;
 };
 
 module.exports = {

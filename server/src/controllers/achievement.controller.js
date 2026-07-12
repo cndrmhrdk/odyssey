@@ -28,6 +28,21 @@ const getAllAchievements = async (req, res, next) => {
     }
 };
 
+const getAchievementById = async (req, res, next) => {
+    try {
+        const result = await achievementService.getAchievementById(
+            req.params.id
+        );
+
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const createAchievement = async (req, res, next) => {
     try {
         const achievement = await achievementService.createAchievement(req.body);
@@ -75,6 +90,7 @@ const deleteAchievement = async (req, res, next) => {
 module.exports = {
     getMyAchievements,
     getAllAchievements,
+    getAchievementById,
     createAchievement,
     updateAchievement,
     deleteAchievement,

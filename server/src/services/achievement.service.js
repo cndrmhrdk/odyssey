@@ -89,6 +89,20 @@ const getAllAchievements = async () => {
     });
 };
 
+const getAchievementById = async (id) => {
+    const achievement = await prisma.achievement.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    if (!achievement) {
+        throw new Error("Achievement tidak ditemukan");
+    }
+
+    return achievement;
+};
+
 const createAchievement = async ({title, description, type, requirement,}) => {
     const existingAchievement = await prisma.achievement.findFirst({
         where: {
@@ -182,6 +196,7 @@ module.exports = {
     checkQuestAchievement,
     getMyAchievements,
     getAllAchievements,
+    getAchievementById,
     createAchievement,
     updateAchievement,
     deleteAchievement,
