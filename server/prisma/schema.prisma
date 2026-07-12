@@ -99,12 +99,12 @@ model Quest {
 
   reward       QuestReward?
 
-  question      String?
-  choiceA       String?
-  choiceB       String?
-  choiceC       String?
-  choiceD       String?
-  correctChoice String?
+  question      String
+  choiceA       String
+  choiceB       String
+  choiceC       String
+  choiceD       String
+  correctChoice String
 
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
