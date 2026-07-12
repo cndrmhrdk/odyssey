@@ -2,16 +2,12 @@ const prisma = require("../config/prisma");
 // const { get } = require("../routes");
 
 const checkQuestAchievement = async (characterId) => {
-    console.log("===== CHECK ACHIEVEMENT =====");
-
     const completedQuest = await prisma.questProgress.count({
         where: {
             characterId,
             status: "COMPLETED",
         },
     });
-
-    console.log("Completed Quest:", completedQuest);
 
     const achievements = await prisma.achievement.findMany({
         where: {
@@ -22,11 +18,7 @@ const checkQuestAchievement = async (characterId) => {
         },
     });
 
-    console.log("Achievement ditemukan:", achievements.length);
-
     for (const achievement of achievements) {
-        console.log("Checking:", achievement.title);
-
         const existingAchievement =
             await prisma.characterAchievement.findUnique({
                 where: {
@@ -37,11 +29,7 @@ const checkQuestAchievement = async (characterId) => {
                 },
             });
 
-        console.log("Existing:", existingAchievement);
-
         if (existingAchievement) continue;
-
-        console.log("INSERT:", achievement.title);
 
         await prisma.characterAchievement.create({
             data: {
@@ -49,8 +37,6 @@ const checkQuestAchievement = async (characterId) => {
                 achievementId: achievement.id,
             },
         });
-
-        console.log("BERHASIL INSERT");
     }
 };
 

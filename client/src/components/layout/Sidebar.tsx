@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-// import logo from "../../assets/code_odyssey_logo.png";
 
 const Sidebar = () => {
     const { user, logout } = useAuth();
@@ -14,33 +13,6 @@ const Sidebar = () => {
 
     return (
         <aside className="w-72 min-h-screen bg-[#111827] border-r border-slate-700 flex flex-col">
-
-            {/* Header */}
-            {/* <div className="p-6 border-b border-slate-700">
-
-                <div className="flex items-center gap-3">
-
-                    <img
-                        src={logo}
-                        alt="Code Odyssey"
-                        className="w-14 h-14 rounded-xl bg-white p-1"
-                    />
-
-                    <div>
-                        <h2 className="text-xl font-black tracking-wider text-yellow-400">
-                            CODE
-                        </h2>
-
-                        <p className="text-sm text-slate-400">
-                            ODYSSEY
-                        </p>
-                    </div>
-
-                </div>
-
-            </div> */}
-
-            {/* Player Card */}
             <div className="mx-4 mt-5 rounded-2xl bg-slate-800 border border-slate-700 p-4">
 
                 <p className="text-xs uppercase tracking-widest text-slate-400">
@@ -54,10 +26,8 @@ const Sidebar = () => {
                 <span className="inline-block mt-2 rounded-full bg-yellow-500 px-3 py-1 text-xs font-bold text-slate-900">
                     {user?.role.name}
                 </span>
-
             </div>
 
-            {/* Menu */}
             <div className="flex-1 px-4 py-6">
 
                 <p className="mb-4 text-xs uppercase tracking-[0.3em] text-slate-500">

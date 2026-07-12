@@ -2,8 +2,6 @@ const express = require("express");
 
 const router = express.Router();
 
-console.log("Quest routes loaded");
-
 const questController = require("../controllers/quest.controller");
 const { verifyToken, authorizeRole } = require("../middlewares/auth.middleware");
 const validate = require("../middlewares/validation.middleware");
