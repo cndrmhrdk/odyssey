@@ -88,7 +88,7 @@ const DashboardPage = () => {
                             <img
                                 src={logo}
                                 alt="logo"
-                                className="w-32 h-32 rounded-full border-4 border-yellow-400 shadow-xl"
+                                className="w-32 h-32 rounded-2xl border-4 border-yellow-400 shadow-xl"
                             />
 
                             <div className="flex-1">

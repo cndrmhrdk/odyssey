@@ -1,5 +1,5 @@
 const characterService = require("../services/character.service");
-const { createCharacterSchema } = require("../validations/character.validation");
+const { createCharacterSchema, updateCharacterSchema } = require("../validations/character.validation");
 
 const createCharacter = async (req, res, next) => {
     try {
@@ -20,6 +20,25 @@ const createCharacter = async (req, res, next) => {
     }
 };
 
+const updateCharacter = async (req, res, next) => {
+    try {
+        const data = updateCharacterSchema.parse(req.body);
+
+        const character = await characterService.updateCharacter(
+            req.user.id,
+            data
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Character berhasil diperbarui",
+            data: character,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const getMyCharacter = async (req, res, next) => {
     const character = await characterService.getMyCharacter(
         req.user.id
@@ -33,5 +52,6 @@ const getMyCharacter = async (req, res, next) => {
 
 module.exports = {
     createCharacter,
+    updateCharacter,
     getMyCharacter,
 };

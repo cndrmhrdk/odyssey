@@ -18,19 +18,22 @@ const updateCharacterSchema = z.object({
     .string()
     .trim()
     .min(3, "Nickname minimal 3 karakter")
-    .max(20, "Nickname maksimal 20 karakter"),  
+    .max(20, "Nickname maksimal 20 karakter")
+    .optional(), 
 
     avatar: z
     .string()
     .trim()
     .optional(),
 
-    title: z
-    .string()
-    .trim()
-    .max(50, "Title maksimal 50 karakter")
-    .optional(),
-});
+})
+
+.refine(
+    (data) => data.nickname !== undefined || data.avatar !== undefined,
+    {
+        message: "Minimal satu field harus diisi",
+    }
+);
 
 module.exports = {
     createCharacterSchema,

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import logo from "../../assets/code_odyssey_logo.png";
+// import logo from "../../assets/code_odyssey_logo.png";
 
 const Sidebar = () => {
     const { user, logout } = useAuth();
@@ -16,7 +16,7 @@ const Sidebar = () => {
         <aside className="w-72 min-h-screen bg-[#111827] border-r border-slate-700 flex flex-col">
 
             {/* Header */}
-            <div className="p-6 border-b border-slate-700">
+            {/* <div className="p-6 border-b border-slate-700">
 
                 <div className="flex items-center gap-3">
 
@@ -38,7 +38,7 @@ const Sidebar = () => {
 
                 </div>
 
-            </div>
+            </div> */}
 
             {/* Player Card */}
             <div className="mx-4 mt-5 rounded-2xl bg-slate-800 border border-slate-700 p-4">

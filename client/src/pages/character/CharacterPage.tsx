@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMyCharacter, createCharacter, } from "../../services/character.service";
+import { getMyCharacter, createCharacter, updateCharacter } from "../../services/character.service";
 import MainLayout from "../../components/layout/MainLayout";
 import logo from "../../assets/code_odyssey_logo.png";
 import toast from "react-hot-toast";
@@ -21,10 +21,16 @@ const CharacterPage = () => {
     const [nickname, setNickname] = useState("");
     const [avatar, setAvatar] = useState("");
 
+    const [title, setTitle] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
+
     const fetchCharacter = async () => {
         try {
             const result = await getMyCharacter();
             setCharacter(result.data);
+            setNickname(result.data.nickname);
+            setAvatar(result.data.avatar || "");
+            setTitle(result.data.title || "");
         } catch (error) {
             console.error(error);
         } finally {
@@ -51,6 +57,23 @@ const CharacterPage = () => {
         } catch (error) {
             console.error(error);
             toast.error("Gagal membuat character");
+        }
+    };
+
+    const handleUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            await updateCharacter({ nickname, avatar, title, });
+
+            toast.success("Character berhasil diupdate");
+
+            setIsEditing(false);
+
+            fetchCharacter();
+        } catch (error) {
+            console.error(error);
+            toast.error("Gagal mengupdate character");
         }
     };
 
@@ -116,15 +139,10 @@ const CharacterPage = () => {
                                                 )}%`,
                                             }}
                                         />
-
                                     </div>
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     {/* STAT */}
@@ -152,90 +170,122 @@ const CharacterPage = () => {
                             <h2 className="text-5xl font-black mt-2 text-cyan-400">
                                 {character.xp}
                             </h2>
-
                         </div>
-
                         <div className="rounded-2xl bg-slate-900 border border-slate-700 p-6">
-
                             <p className="text-slate-400">
                                 Coin
                             </p>
-
                             <h2 className="text-5xl font-black mt-2 text-yellow-300">
                                 {character.coin}
                             </h2>
+                        </div>
+                    </div>
+                    <div className="mt-8">
+                        <button onClick={() => setIsEditing(true)} className="rounded-xl bg-yellow-400 text-slate-900 px-6 py-3 font-bold hover:scale-105 transition" >
+                            ✏ Edit Character
+                        </button>
+                    </div>
+                    {isEditing && (
+                        <div className="rounded-3xl bg-slate-900 border border-slate-700 p-8">
+
+                            <h2 className="text-2xl font-bold mb-6">
+                                Edit Character
+                            </h2>
+
+                            <form
+                                onSubmit={handleUpdate}
+                                className="space-y-5"
+                            >
+
+                                <input
+                                    type="text"
+                                    value={nickname}
+                                    onChange={(e) => setNickname(e.target.value)}
+                                    className="w-full rounded-xl bg-slate-800 border border-slate-700 px-5 py-3"
+                                    placeholder="Nickname"
+                                />
+
+                                <input
+                                    type="text"
+                                    value={avatar}
+                                    onChange={(e) => setAvatar(e.target.value)}
+                                    className="w-full rounded-xl bg-slate-800 border border-slate-700 px-5 py-3"
+                                    placeholder="Avatar URL"
+                                />
+
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    className="w-full rounded-xl bg-slate-800 border border-slate-700 px-5 py-3"
+                                    placeholder="Title"
+                                />
+
+                                <div className="flex gap-4">
+
+                                    <button
+                                        type="submit"
+                                        className="rounded-xl bg-cyan-500 px-6 py-3 font-bold"
+                                    >
+                                        Save
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditing(false)}
+                                        className="rounded-xl bg-slate-700 px-6 py-3 font-bold"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                </div>
+
+                            </form>
 
                         </div>
-
-                    </div>
-
+                    )}
                     {/* DETAIL */}
-
                     <div className="rounded-3xl bg-slate-900 border border-slate-700 p-8">
-
                         <h2 className="text-2xl font-bold mb-6">
                             Character Information
                         </h2>
-
                         <div className="space-y-5">
-
                             <div className="flex justify-between border-b border-slate-800 pb-3">
-
                                 <span className="text-slate-400">
                                     Nickname
                                 </span>
-
                                 <span>{character.nickname}</span>
-
                             </div>
-
                             <div className="flex justify-between border-b border-slate-800 pb-3">
-
                                 <span className="text-slate-400">
                                     Title
                                 </span>
-
                                 <span>
                                     {character.title || "-"}
                                 </span>
-
                             </div>
-
                             <div className="flex justify-between border-b border-slate-800 pb-3">
-
                                 <span className="text-slate-400">
                                     Level
                                 </span>
-
                                 <span>{character.level}</span>
-
                             </div>
-
                             <div className="flex justify-between border-b border-slate-800 pb-3">
-
                                 <span className="text-slate-400">
                                     XP
                                 </span>
-
                                 <span>{character.xp}</span>
-
                             </div>
-
                             <div className="flex justify-between">
-
                                 <span className="text-slate-400">
                                     Coin
                                 </span>
-
                                 <span>{character.coin}</span>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
+                
 
             ) : (
 
