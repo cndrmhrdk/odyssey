@@ -28,6 +28,7 @@ const createCharacter = async (userId, data) => {
             userId,
             nickname: data.nickname,
             avatar: data.avatar,
+            avatar: data.title,
         },
     });
 
@@ -68,9 +69,11 @@ const updateCharacter = async (userId, data) => {
             ...(data.nickname !== undefined && {
                 nickname: data.nickname,
             }),
-
             ...(data.avatar !== undefined && {
                 avatar: data.avatar,
+            }),
+            ...(data.title !== undefined && {
+                title: data.title,
             }),
         },
     });

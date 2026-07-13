@@ -11,6 +11,13 @@ const createCharacterSchema = z.object({
     .string()
     .trim()
     .optional(),
+
+    title: z
+    .string()
+    .trim()
+    .min(3, "Nickname minimal 3 karakter")
+    .max(20, "Nickname maksimal 20 karakter")
+    .optional(),
 });
 
 const updateCharacterSchema = z.object({
@@ -26,10 +33,16 @@ const updateCharacterSchema = z.object({
     .trim()
     .optional(),
 
+    title: z
+    .string()
+    .trim()
+    .min(3, "Nickname minimal 3 karakter")
+    .max(20, "Nickname maksimal 20 karakter")
+    .optional(),
 })
 
 .refine(
-    (data) => data.nickname !== undefined || data.avatar !== undefined,
+    (data) => data.nickname !== undefined || data.avatar !== undefined || data.title !== undefined,
     {
         message: "Minimal satu field harus diisi",
     }
