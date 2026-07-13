@@ -171,12 +171,6 @@ Install dependency
 npm install
 ```
 
-Buat file `.env`
-
-```env
-VITE_API_URL=http://localhost:3000
-```
-
 Jalankan React
 
 ```bash
